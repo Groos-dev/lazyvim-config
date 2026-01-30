@@ -8,10 +8,6 @@ foo.*
 *.log
 data
 
-# LazyVim specific
-lazy-lock.json
-lazyvim.json
-
 # System files
 .DS_Store
 *.swp
