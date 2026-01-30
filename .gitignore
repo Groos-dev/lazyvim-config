@@ -1,3 +1,4 @@
+# Neovim runtime files
 tt.*
 .tests
 doc/tags
@@ -6,3 +7,17 @@ debug
 foo.*
 *.log
 data
+
+# LazyVim specific
+lazy-lock.json
+lazyvim.json
+
+# System files
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Plugin data
+plugin/
+spell/
