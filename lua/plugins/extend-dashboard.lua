@@ -2,8 +2,15 @@ return {
   {
     "folke/snacks.nvim",
     opts = function(_, opts)
-      -- 在这里定义你自己的 header
-      local new_header = [[
+      opts.dashboard = opts.dashboard or {}
+
+      -- 覆盖默认的 header 格式，不使用居中对齐
+      opts.dashboard.formats = opts.dashboard.formats or {}
+      opts.dashboard.formats.header = { "%s", align = "left" }
+
+      opts.dashboard.sections = {
+        {
+          header = [[
 ████████╗ █████╗ ██╗  ██╗███████╗    ██╗████████╗    ███████╗ █████╗ ███████╗██╗   ██╗
 ╚══██╔══╝██╔══██╗██║ ██╔╝██╔════╝    ██║╚══██╔══╝    ██╔════╝██╔══██╗██╔════╝╚██╗ ██╔╝
    ██║   ███████║█████╔╝ █████╗      ██║   ██║       █████╗  ███████║███████╗ ╚████╔╝
@@ -12,12 +19,12 @@ return {
    ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝    ╚═╝   ╚═╝       ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝
 
     Enjoy the journey, one commit at a time!
-]]
-
-      opts.dashboard = opts.dashboard or {}
-      opts.dashboard.preset = opts.dashboard.preset or {}
-      opts.dashboard.preset.header = new_header
-      -- 替换默认的 header
+]],
+          padding = 1,
+        },
+        { section = "keys", gap = 1, padding = 1 },
+        { section = "startup" },
+      }
     end,
   },
 }
