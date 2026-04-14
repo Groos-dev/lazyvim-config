@@ -7,9 +7,11 @@ return {
       })
     end,
     keys = {
-      { "<leader>ghp", function() require("gitsigns").preview_hunk() end, desc = "Preview Hunk" },
-      { "<leader>ghb", function() require("gitsigns").blame_line() end, desc = "Blame Line" },
-      { "<leader>ghB", function() require("gitsigns").blame_line({ full = true }) end, desc = "Blame Line Full" },
+      { "]h", function() require("gitsigns").next_hunk() end, desc = "Next Hunk" },
+      { "[h", function() require("gitsigns").prev_hunk() end, desc = "Prev Hunk" },
+      { "<leader>gph", function() require("gitsigns").preview_hunk() end, desc = "Preview Hunk" },
+      { "<leader>gb", function() require("gitsigns").blame_line() end, desc = "Blame Line" },
+      { "<leader>gB", function() require("gitsigns").blame_line({ full = true }) end, desc = "Blame Line Full" },
     },
   },
 }
