@@ -1,4 +1,5 @@
 local java_filetypes = { "java" }
+local eclipse_formatter_url = vim.fn.expand("~/.config/nvim/java/eclipse-java-style.xml")
 
 local function extend_or_override(config, custom, ...)
   if type(custom) == "function" then
@@ -19,6 +20,20 @@ return {
       if not vim.tbl_contains(opts.cmd, "--jvm-arg=-Xmx4G") then
         table.insert(opts.cmd, "--jvm-arg=-Xmx4G")
       end
+      opts.settings = opts.settings or {}
+      opts.settings.java = opts.settings.java or {}
+      opts.settings.java.inlayHints = opts.settings.java.inlayHints or {
+        parameterNames = {
+          enabled = "all",
+        },
+      }
+      opts.settings.java.format = opts.settings.java.format or {
+        enabled = true,
+        settings = {
+          url = eclipse_formatter_url,
+          profile = "Default",
+        },
+      }
       return opts
     end,
     init = function()
