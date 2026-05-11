@@ -5,6 +5,9 @@ return {
     keys = {
       { "<leader>gd", false },
       { "<leader>gD", false },
+      { "<leader>gh", false },
+      { "<leader>gH", false },
+      { "<leader>gf", false },
     },
   },
   {
@@ -38,13 +41,11 @@ return {
       vim.cmd.cnoreabbrev("<expr> dfc getcmdtype() == ':' && getcmdline() == 'dfc' ? 'Dfc' : 'dfc'")
     end,
     keys = {
-      { "<leader>g", group = "Git" },
-      { "<leader>gv", group = "Git History" },
-      { "<leader>gvo", "<cmd>DiffviewOpen HEAD<cr>", desc = "Open Diffview" },
-      { "<leader>gvq", "<cmd>DiffviewClose<cr>", desc = "Close Diffview" },
-      { "<leader>gvf", "<cmd>DiffviewFileHistory %<cr>", desc = "File History" },
-      { "<leader>gvr", "<cmd>DiffviewFileHistory<cr>", desc = "Repo History" },
-      { "<leader>gvc", "<cmd>DiffviewOpen HEAD^!<cr>", desc = "HEAD Commit Diff" },
+      { "<leader>gd", "<cmd>DiffviewOpen<cr>",          desc = "Diff working tree" },
+      { "<leader>gD", "<cmd>DiffviewOpen HEAD~1<cr>",   desc = "Diff last commit" },
+      { "<leader>gh", "<cmd>DiffviewFileHistory<cr>",   desc = "File history (repo)" },
+      { "<leader>gH", "<cmd>DiffviewFileHistory %<cr>", desc = "File history (current)" },
+      { "<leader>gx", "<cmd>DiffviewClose<cr>",         desc = "Diff close" },
     },
     opts = function()
       local actions = require("diffview.actions")
@@ -78,24 +79,32 @@ return {
           end,
         },
         keymaps = {
-          view = {
-            { "n", "E", actions.goto_file_edit, { desc = "Edit Source File" } },
-            { "n", "<Left>", actions.select_prev_entry, { desc = "Previous File" } },
-            { "n", "<Right>", actions.select_next_entry, { desc = "Next File" } },
-            { "n", "K", actions.select_prev_entry, { desc = "Previous File" } },
-            { "n", "J", actions.select_next_entry, { desc = "Next File" } },
-          },
           file_panel = {
-            { "n", "E", actions.goto_file_edit, { desc = "Edit Source File" } },
-            { "n", "<Right>", actions.focus_entry, { desc = "Open and Focus Entry" } },
-            { "n", "K", actions.select_prev_entry, { desc = "Previous File" } },
-            { "n", "J", actions.select_next_entry, { desc = "Next File" } },
+            { "n", "j",       actions.next_entry,         { desc = "下一个文件" } },
+            { "n", "k",       actions.prev_entry,         { desc = "上一个文件" } },
+            { "n", "<cr>",    actions.select_entry,       { desc = "打开文件 diff" } },
+            { "n", "s",       actions.toggle_stage_entry, { desc = "stage/unstage" } },
+            { "n", "S",       actions.stage_all,          { desc = "stage 全部" } },
+            { "n", "U",       actions.unstage_all,        { desc = "unstage 全部" } },
+            { "n", "X",       actions.restore_entry,      { desc = "discard 改动" } },
+            { "n", "R",       actions.refresh_files,      { desc = "刷新" } },
+            { "n", "<tab>",   actions.select_next_entry,  { desc = "下一个文件" } },
+            { "n", "<s-tab>", actions.select_prev_entry,  { desc = "上一个文件" } },
+            { "n", "q",       "<cmd>DiffviewClose<cr>",   { desc = "关闭" } },
+          },
+          view = {
+            { "n", "]x",      actions.next_conflict,      { desc = "下一个冲突" } },
+            { "n", "[x",      actions.prev_conflict,      { desc = "上一个冲突" } },
+            { "n", "<tab>",   actions.select_next_entry,  { desc = "下一个文件" } },
+            { "n", "<s-tab>", actions.select_prev_entry,  { desc = "上一个文件" } },
+            { "n", "q",       "<cmd>DiffviewClose<cr>",   { desc = "关闭" } },
           },
           file_history_panel = {
-            { "n", "E", actions.goto_file_edit, { desc = "Edit Source File" } },
-            { "n", "<Right>", actions.focus_entry, { desc = "Open and Focus Entry" } },
-            { "n", "K", actions.select_prev_entry, { desc = "Previous File" } },
-            { "n", "J", actions.select_next_entry, { desc = "Next File" } },
+            { "n", "j",    actions.next_entry,       { desc = "下一条" } },
+            { "n", "k",    actions.prev_entry,       { desc = "上一条" } },
+            { "n", "<cr>", actions.select_entry,     { desc = "查看这次 commit" } },
+            { "n", "y",    actions.copy_hash,        { desc = "复制 commit hash" } },
+            { "n", "q",    "<cmd>DiffviewClose<cr>", { desc = "关闭" } },
           },
         },
       }
