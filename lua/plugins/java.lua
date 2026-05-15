@@ -16,24 +16,31 @@ return {
     ft = java_filetypes,
     opts = function(_, opts)
       opts = opts or {}
-      opts.cmd = opts.cmd or { vim.fn.exepath("jdtls") }
+      local mason = vim.fn.stdpath("data") .. "/mason"
+      opts.cmd = { mason .. "/bin/jdtls" }
+      local lombok = mason .. "/share/jdtls/lombok.jar"
+      if vim.fn.filereadable(lombok) == 1 then
+        table.insert(opts.cmd, "--jvm-arg=-javaagent:" .. lombok)
+      end
       if not vim.tbl_contains(opts.cmd, "--jvm-arg=-Xmx4G") then
         table.insert(opts.cmd, "--jvm-arg=-Xmx4G")
       end
       opts.settings = opts.settings or {}
       opts.settings.java = opts.settings.java or {}
-      opts.settings.java.inlayHints = opts.settings.java.inlayHints or {
-        parameterNames = {
-          enabled = "all",
-        },
-      }
-      opts.settings.java.format = opts.settings.java.format or {
-        enabled = true,
-        settings = {
-          url = eclipse_formatter_url,
-          profile = "Default",
-        },
-      }
+      opts.settings.java.inlayHints = opts.settings.java.inlayHints
+        or {
+          parameterNames = {
+            enabled = "all",
+          },
+        }
+      opts.settings.java.format = opts.settings.java.format
+        or {
+          enabled = true,
+          settings = {
+            url = eclipse_formatter_url,
+            profile = "Default",
+          },
+        }
       return opts
     end,
     init = function()
@@ -43,17 +50,38 @@ return {
           lazy.load({ plugins = { "nvim-jdtls" } })
         end
 
-        if vim.bo.filetype ~= "java" then
-          vim.notify("请在 Java buffer 中执行 :StartJdts", vim.log.levels.WARN)
+        local function start_on_buf(bufnr)
+          vim.api.nvim_buf_call(bufnr, function()
+            vim.b.start_jdtls = true
+            vim.api.nvim_exec_autocmds("FileType", {
+              pattern = "java",
+              modeline = false,
+            })
+          end)
+        end
+
+        if vim.bo.filetype == "java" then
+          start_on_buf(0)
           return
         end
 
-        vim.b.start_jdtls = true
-        vim.api.nvim_exec_autocmds("FileType", {
-          pattern = "java",
-          modeline = false,
-        })
+        -- Find a Java buffer in the project
+        local cwd = vim.fn.getcwd()
+        for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+          if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].filetype == "java" then
+            local bufpath = vim.api.nvim_buf_get_name(bufnr)
+            if bufpath:find(cwd, 1, true) then
+              start_on_buf(bufnr)
+              vim.notify("jdtls started via " .. vim.fn.fnamemodify(bufpath, ":."), vim.log.levels.INFO)
+              return
+            end
+          end
+        end
+
+        vim.notify("No Java buffer found in current project, open a Java file first", vim.log.levels.WARN)
       end, { desc = "Start/attach jdtls Java LSP" })
+
+      vim.keymap.set("n", "<leader>js", "<cmd>StartJdts<cr>", { desc = "Start jdtls" })
     end,
     config = function(_, opts)
       local LazyVim = require("lazyvim.util")
@@ -94,9 +122,9 @@ return {
             bundles = bundles,
           },
           settings = opts.settings,
-          capabilities = LazyVim.has("blink.cmp") and require("blink.cmp").get_lsp_capabilities()
-            or LazyVim.has("cmp-nvim-lsp") and require("cmp_nvim_lsp").default_capabilities()
-            or nil,
+          capabilities = LazyVim.has("blink.cmp") and require("blink.cmp").get_lsp_capabilities() or LazyVim.has(
+            "cmp-nvim-lsp"
+          ) and require("cmp_nvim_lsp").default_capabilities() or nil,
         }, opts.jdtls)
 
         require("jdtls").start_or_attach(config)
