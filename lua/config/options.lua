@@ -7,3 +7,4 @@ vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.wo.number = true
 vim.wo.relativenumber = true
+vim.opt.shada = "!,'1000,<50,s10,h"

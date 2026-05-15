@@ -4,6 +4,14 @@
 local keymap = vim.keymap
 keymap.set("i", "jk", "<ESC>", { desc = "change to normal mode" })
 
+-- Disable macro recording, keep q: q/ q?
+keymap.set("n", "q", function()
+  local c = vim.fn.getcharstr()
+  if c == ":" or c == "/" or c == "?" then
+    vim.api.nvim_feedkeys("q" .. c, "n", false)
+  end
+end, { desc = "Disable macro recording" })
+
 -- VSCode specific keymaps when running in VSCode with Neovim
 if vim.g.vscode then
   -- you can add keymaps in this place

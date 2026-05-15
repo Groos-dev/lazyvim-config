@@ -17,3 +17,7 @@ data
 # Plugin data
 plugin/
 spell/
+
+# Local/session state
+.omc/
+.nvimlog
